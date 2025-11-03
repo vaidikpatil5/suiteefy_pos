@@ -6,7 +6,7 @@ import '../models/bill.dart';
 
 class BillDetailScreen extends StatefulWidget {
   final Bill bill;
-  const BillDetailScreen({Key? key, required this.bill}) : super(key: key);
+  const BillDetailScreen({super.key, required this.bill});
 
   @override
   _BillDetailScreenState createState() => _BillDetailScreenState();

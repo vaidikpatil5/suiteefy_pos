@@ -37,7 +37,7 @@ class _NewBillScreenState extends State<NewBillScreen> {
     }
   }
 
-  void _nextButtonPressed({bool isPrint = false}) {
+  void _nextButtonPressed() {
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
 

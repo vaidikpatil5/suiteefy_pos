@@ -5,7 +5,7 @@ import '../db/database_helper.dart';
 import '../screens/bill_detail_screen.dart';
 
 class BillHistoryScreen extends StatefulWidget {
-  const BillHistoryScreen({Key? key}) : super(key: key);
+  const BillHistoryScreen({super.key});
 
   @override
   _BillHistoryScreenState createState() => _BillHistoryScreenState();

@@ -1,6 +1,6 @@
 {
-    "name": "mom_store_pos",
-    "short_name": "mom_store_pos",
+    "name": "suiteefy_pos",
+    "short_name": "suiteefy_pos",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

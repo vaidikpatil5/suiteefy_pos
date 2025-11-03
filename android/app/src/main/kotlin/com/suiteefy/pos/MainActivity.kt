@@ -1,4 +1,4 @@
-package com.example.mom_store_pos
+package com.suiteefy.pos
 
 import io.flutter.embedding.android.FlutterActivity
 

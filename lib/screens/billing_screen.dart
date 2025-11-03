@@ -3,7 +3,7 @@ import '../db/database_helper.dart';
 import '../models/product.dart';
 
 class BillingScreen extends StatefulWidget {
-  const BillingScreen({Key? key}) : super(key: key);
+  const BillingScreen({super.key});
 
   @override
   State<BillingScreen> createState() => _BillingScreenState();
