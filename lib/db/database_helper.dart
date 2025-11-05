@@ -1,7 +1,8 @@
 // lib/db/database_helper.dart
 import 'dart:async';
+import 'dart:io';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../models/product.dart';
 import '../models/bill.dart';
 import 'package:path_provider/path_provider.dart';
@@ -9,8 +10,12 @@ import 'package:path_provider/path_provider.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
-  DatabaseHelper._init();
-
+  DatabaseHelper._init() {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
+  }
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -63,18 +68,23 @@ class DatabaseHelper {
   // PRODUCT CRUD
   Future<void> insertProduct(Product p) async {
     final db = await instance.database;
-    await db.insert('inventory', p.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'inventory',
+      p.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
-
 
   Future<Product?> getProductById(String productId) async {
     final db = await instance.database;
-    final maps = await db.query('inventory', where: 'product_id = ?', whereArgs: [productId]);
+    final maps = await db.query(
+      'inventory',
+      where: 'product_id = ? COLLATE NOCASE',
+      whereArgs: [productId.trim()],
+    );
     if (maps.isNotEmpty) return Product.fromMap(maps.first);
     return null;
-
-}
-
+  }
 
   Future<List<Product>> getAllProducts() async {
     final db = await instance.database;
@@ -82,9 +92,25 @@ class DatabaseHelper {
     return result.map((m) => Product.fromMap(m)).toList();
   }
 
+  Future<List<Product>> searchProductsByName(String query) async {
+    final db = await instance.database;
+    final result = await db.query(
+      'inventory',
+      where: 'name LIKE ?',
+      whereArgs: ['%$query%'],
+      orderBy: 'name',
+    );
+    return result.map((m) => Product.fromMap(m)).toList();
+  }
+
   Future<int> updateProductStock(String productId, int newStock) async {
     final db = await instance.database;
-    return await db.update('inventory', {'stock': newStock}, where: 'product_id = ?', whereArgs: [productId]);
+    return await db.update(
+      'inventory',
+      {'stock': newStock},
+      where: 'product_id = ?',
+      whereArgs: [productId],
+    );
   }
 
   // BILL CRUD
@@ -97,11 +123,20 @@ class DatabaseHelper {
         map['bill_id'] = billId;
         await txn.insert('bill_items', map);
         // reduce stock
-        final prod = await txn.query('inventory', where: 'product_id = ?', whereArgs: [it.productId]);
+        final prod = await txn.query(
+          'inventory',
+          where: 'product_id = ?',
+          whereArgs: [it.productId],
+        );
         if (prod.isNotEmpty) {
           final currentStock = prod.first['stock'] as int;
           final newStock = currentStock - it.quantity;
-          await txn.update('inventory', {'stock': newStock}, where: 'product_id = ?', whereArgs: [it.productId]);
+          await txn.update(
+            'inventory',
+            {'stock': newStock},
+            where: 'product_id = ?',
+            whereArgs: [it.productId],
+          );
         }
       }
       return billId;
@@ -116,7 +151,11 @@ class DatabaseHelper {
 
   Future<List<BillItem>> getItemsForBill(int billId) async {
     final db = await instance.database;
-    final rows = await db.query('bill_items', where: 'bill_id = ?', whereArgs: [billId]);
+    final rows = await db.query(
+      'bill_items',
+      where: 'bill_id = ?',
+      whereArgs: [billId],
+    );
     return rows.map((r) => BillItem.fromMap(r)).toList();
   }
 

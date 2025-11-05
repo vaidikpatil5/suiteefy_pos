@@ -4,6 +4,7 @@ import '../db/database_helper.dart';
 import '../models/product.dart';
 import '../utils/contact_picker.dart';
 import 'billing_summary_screen.dart';
+import '../theme.dart';
 
 class NewBillScreen extends StatefulWidget {
   const NewBillScreen({super.key});
@@ -34,6 +35,19 @@ class _NewBillScreenState extends State<NewBillScreen> {
           SnackBar(content: Text("No product found for code: $code")),
         );
       }
+    }
+  }
+
+  Future<void> _searchProduct() async {
+    final selectedProduct = await showSearch<Product?>(
+      context: context,
+      delegate: ProductSearchDelegate(),
+    );
+
+    if (selectedProduct != null) {
+      setState(() {
+        scannedProducts.add(selectedProduct);
+      });
     }
   }
 
@@ -138,6 +152,12 @@ class _NewBillScreenState extends State<NewBillScreen> {
               icon: const Icon(Icons.qr_code_scanner),
               label: const Text("Add Item (Scan)"),
             ),
+            const SizedBox(height: 10),
+            ElevatedButton.icon(
+              onPressed: _searchProduct,
+              icon: const Icon(Icons.search),
+              label: const Text("Add Item (Search)"),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
@@ -163,7 +183,7 @@ class _NewBillScreenState extends State<NewBillScreen> {
               icon: const Icon(Icons.arrow_forward),
               label: const Text("Next"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: AppTheme.roseDust,
                 padding: const EdgeInsets.symmetric(
                   vertical: 14,
                   horizontal: 30,
@@ -173,6 +193,61 @@ class _NewBillScreenState extends State<NewBillScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class ProductSearchDelegate extends SearchDelegate<Product?> {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, null),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) => buildSuggestions(context);
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (query.isEmpty) {
+      return const Center(child: Text('Search for products by name'));
+    }
+
+    final db = DatabaseHelper.instance;
+
+    return FutureBuilder<List<Product>>(
+      future: db.searchProductsByName(query),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No products found.'));
+        }
+
+        final results = snapshot.data!;
+
+        return ListView.builder(
+          itemCount: results.length,
+          itemBuilder: (context, index) {
+            final product = results[index];
+            return ListTile(
+              title: Text(product.name),
+              subtitle: Text('₹${product.price}'),
+              onTap: () => close(context, product),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -238,17 +313,17 @@ class _QRScannerPageState extends State<QRScannerPage> {
               height: 240,
               width: 240,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppTheme.satinGold, width: 2),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
           if (isScanning)
-            const Center(
+            Center(
               child: CircleAvatar(
                 radius: 40,
-                backgroundColor: Colors.black54,
-                child: CircularProgressIndicator(color: Colors.white),
+                backgroundColor: AppTheme.deepCocoa.withOpacity(0.5),
+                child: const CircularProgressIndicator(color: Colors.white),
               ),
             ),
         ],

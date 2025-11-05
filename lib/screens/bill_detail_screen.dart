@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/bill.dart';
 import '../db/database_helper.dart';
-import '../models/bill.dart';
 
 class BillDetailScreen extends StatefulWidget {
   final Bill bill;
