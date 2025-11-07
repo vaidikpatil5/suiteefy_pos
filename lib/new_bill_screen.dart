@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../utils/contact_picker.dart';
 import 'billing_summary_screen.dart';
 import '../theme.dart';
+import '../widgets/mandala_background.dart';
 
 class NewBillScreen extends StatefulWidget {
   const NewBillScreen({super.key});
@@ -105,92 +106,95 @@ class _NewBillScreenState extends State<NewBillScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Create New Bill")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: "Customer Name",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: "Phone Number",
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.phone,
-                  ),
+    return MandalaBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(title: const Text("Create New Bill")),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: "Customer Name",
+                  border: OutlineInputBorder(),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.contacts),
-                  onPressed: () async {
-                    final contactData = await pickContact(context);
-                    if (contactData != null) {
-                      setState(() {
-                        _nameController.text = contactData['name']!;
-                        _phoneController.text = contactData['phone']!;
-                      });
-                    }
+              ),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _phoneController,
+                      decoration: const InputDecoration(
+                        labelText: "Phone Number",
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.contacts),
+                    onPressed: () async {
+                      final contactData = await pickContact(context);
+                      if (contactData != null) {
+                        setState(() {
+                          _nameController.text = contactData['name']!;
+                          _phoneController.text = contactData['phone']!;
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _scanProduct,
+                icon: const Icon(Icons.qr_code_scanner),
+                label: const Text("Add Item (Scan)"),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: _searchProduct,
+                icon: const Icon(Icons.search),
+                label: const Text("Add Item (Search)"),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: scannedProducts.length,
+                  itemBuilder: (context, index) {
+                    final item = scannedProducts[index];
+                    return ListTile(
+                      title: Text(item.name),
+                      subtitle: Text("Price: ₹${item.price}"),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() => scannedProducts.removeAt(index));
+                        },
+                      ),
+                    );
                   },
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _scanProduct,
-              icon: const Icon(Icons.qr_code_scanner),
-              label: const Text("Add Item (Scan)"),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: _searchProduct,
-              icon: const Icon(Icons.search),
-              label: const Text("Add Item (Search)"),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: scannedProducts.length,
-                itemBuilder: (context, index) {
-                  final item = scannedProducts[index];
-                  return ListTile(
-                    title: Text(item.name),
-                    subtitle: Text("Price: ₹${item.price}"),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() => scannedProducts.removeAt(index));
-                      },
-                    ),
-                  );
-                },
               ),
-            ),
 
-            ElevatedButton.icon(
-              onPressed: () => _nextButtonPressed(),
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text("Next"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.roseDust,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 14,
-                  horizontal: 30,
+              ElevatedButton.icon(
+                onPressed: () => _nextButtonPressed(),
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text("Next"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.roseDust,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 30,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

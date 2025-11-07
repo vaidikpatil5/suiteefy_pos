@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import '../models/bill.dart';
+import '../models/bill_item.dart';
 
 Future<void> generateBillPdf(Bill bill, List<BillItem> items) async {
   final pdf = pw.Document();

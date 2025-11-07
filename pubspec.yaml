@@ -23,19 +23,22 @@ dependencies:
   pdf: ^3.11.0
   printing: ^5.13.2
   google_fonts: ^6.2.1  
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^5.0.0
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/app-logosuiteefy.png"
+  image_path: "assets/app_icon.png"
+
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/
+    - assets/suiteefy-iconsq.png
+    - assets/mandala_top.png
+    - assets/mandala_bottom.png

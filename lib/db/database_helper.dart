@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import '../models/product.dart';
 import '../models/bill.dart';
+import '../models/bill_item.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
